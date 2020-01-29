@@ -1,20 +1,24 @@
 package com.company;
 
 public abstract class Avio {
+
     private String identificador;
 
     private Coordenada coordenadesActuals;
+    private double maximaVelocitat;
+    private double minDistanciaSeguretat;
+
+    //control
     private Coordenada coordenadesDesti;
     private double velocitat;
-    private double seguretatDistancia;
-    private double maximaVelocitat;
     private boolean motor;
+
     
-    public Avio(String nom, Coordenada coordenada){
+    public Avio(String nom, Coordenada coordenada, double maximaVelocitat, double minDistanciaSeguretat){
         this.identificador = nom;
         this.coordenadesActuals = coordenada;
-        this.seguretatDistancia = Main.MINDISTANCIASEGURETAT;
-        this.maximaVelocitat = Main.MAXVELOCITATAVIONSCOMBAT;
+        this.maximaVelocitat = maximaVelocitat;
+        this.minDistanciaSeguretat = minDistanciaSeguretat;
         this.motor = false;
     }
 
@@ -44,13 +48,15 @@ public abstract class Avio {
         return this.maximaVelocitat;
     }
 
+    public void setMaximaVelocitat(double maximaVelocitat) { this.maximaVelocitat = maximaVelocitat; }
+
     public double getMinVelocitat(){
-        return this.maximaVelocitat/10;
+        return this.maximaVelocitat / 10;
     }
 
-    public double getSeguretatDistancia() {
-        return seguretatDistancia;
-    }
+    public double getMinDistanciaSeguretat() { return minDistanciaSeguretat; }
+
+    public void setMinDistanciaSeguretat(double minDistanciaSeguretat) { this.minDistanciaSeguretat = minDistanciaSeguretat; }
 
     public void setCoordenadesActuals(Coordenada coordenadesActuals) {
         this.coordenadesActuals = coordenadesActuals;
@@ -71,10 +77,10 @@ public abstract class Avio {
     }
 
     public void setVelocitat(double velocitat) {
-        if (velocitat < this.seguretatDistancia ){
-            System.out.println("La velocitat indicada no es suficient, torna-ho a intentar.");
+        double minVel = this.getMinVelocitat();
+        if (velocitat < minVel ){
+            System.out.println("La velocitat indicada no es suficient, la mínima és . "+ minVel);
         }
-
         else {
             this.velocitat = velocitat;
         }
@@ -184,7 +190,7 @@ public abstract class Avio {
                         check = false;
                         System.out.println("L'avio s'estavellarà directament contra " + avio.getIdentificador() + avio.getCoordenadesActuals().toString() + " a una distància de " + distanciaAvioSecAmbAvioOrigen + "!");
                     }
-                    else if (distanciaAvioSecAmbAvioOrigen  <= segment +  this.seguretatDistancia) {
+                    else if (distanciaAvioSecAmbAvioOrigen  <= segment + this.minDistanciaSeguretat) {
                         check = false;
                         System.out.println("L'avio no mantindra la distancia de seguretat amb l'avio "+ avio.getIdentificador() + avio.getCoordenadesActuals().toString());
                     }
@@ -194,7 +200,7 @@ public abstract class Avio {
 
                     distanciaAvioSecAmbRecorregut = Math.sqrt(dividentOP) / segment;
 
-                    if (distanciaAvioSecAmbRecorregut < Main.MINDISTANCIASEGURETAT) {
+                    if (distanciaAvioSecAmbRecorregut < this.minDistanciaSeguretat) {
                         check = false;
                         System.out.println("L'avio no mantindrà la distància de seguretat amb " + avio.getIdentificador() + avio.getCoordenadesActuals().toString() + "a una distància de "+distanciaAvioSecAmbAvioOrigen + "!");
                     }

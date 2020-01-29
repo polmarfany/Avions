@@ -4,51 +4,41 @@ import java.util.ArrayList;
 import java.util.Scanner;
 
 public class Main {
-
     public static Scanner teclat = new Scanner(System.in);
 
     public static ArrayList<Avio> arrayListAvions = new ArrayList<>();
-    public static double MINDISTANCIASEGURETAT = 2;
     public static double MAXVELOCITATAVIONSCOMERCIALS = 50;
     public static double MAXVELOCITATAVIONSCOMBAT = 100;
+    public static double MINDISTANCIASEGURETATCOMERCIAL = 2;
+    public static double MINDISTANCIASEGURETATCOMBAT = 2;
     public static int MAXPASSATGERS = 250;
     public static int MAXTRIPULACIO = 40;
     public static double MAXCOORDENADA = 1000;
     public static String LS = System.lineSeparator();
 
+
+
     public static void main(String[] args) {
 
-        System.out.println("Això és el simulador d'un control aeri. Aquest control té una mesura de 1000km3 (cúbics, 1000x1000x1000). Els avions es mouran també en blocks");
-        System.out.println("Per començar, hauràs d'indicar un parell de configuracions per a la teva aplicació.");
-        System.out.println("Primer de tot, indica la distància de seguretat mínima (recomanem que sigui 2 blocks per a que sigui realista).");
-        System.out.println("NOTA: els avions de combat no han de mantenir aquesta distancia, pero tot i així poden estavellar-se:");
-        //MINDISTANCIASEGURETAT = teclat.nextDouble();
-        System.out.println("Segon, indica quina vols que sigui la velocitat màxima dels avions comercials (recomanem 50).");
-        System.out.println("NOTA: els avions de combat tindràn obligatòriament el doble de velocitat, i la velocitat mínima d'ambods tipus serà 1 desena part de la seva VELOCITAT MAXIMA):");
-
-        //MAXVELOCITATAVIONSCOMERCIALS = teclat.nextDouble();
-        MAXVELOCITATAVIONSCOMBAT = MAXVELOCITATAVIONSCOMERCIALS* 2;
+        System.out.println("Això és el simulador d'un control aeri. Aquest control té una mesura, per defecte, de 1000blocks^3 (cúbics, 1000x1000x1000). Els avions es mouran també en blocks");
 
         while (true) {
             String menu = "Benvingut al Menú." + LS
-                    + "1. Gestió de l'espai aeri: Afegir/treure avions, modoficar un avio" + LS
-                    + "2. Control dels avions: Controles de manera individual el comportament de cada avió." + LS
-                    + "3. Exit program." + LS
-                    + "0. Mapa. RECORDA: En qualsevol moment pots escriure el caracter '0' i s'imprimirà tot l'espai aeri, sense interrompre l'activitat anterior. " + LS
+                    + "'0'. Exit program." + LS
+                    + "'1'. Gestió de l'espai aeri: Afegir/treure avions, modoficar un avio, modificar parametres" + LS
+                    + "'2'. Control dels avions: Controles de manera individual el comportament de cada avió." + LS
+                    + "'-1'. Mapa. RECORDA: En qualsevol moment pots escriure el caracter '-1' i s'imprimirà tot l'espai aeri, sense interrompre l'activitat anterior. " + LS
                     + "Introdueix l'opció desitjada: ";
 
-            switch ( demanarInt(menu, 3) ) {
+            switch ( demanarInt(menu, 2) ) {
+                case 0:
+                    System.exit(0);
+                    break;
                 case 1:
                     gestioEspai();
                     break;
                 case 2:
                     controlAvions();
-                    break;
-                case 0:
-                    mapa();
-                    break;
-                case 3:
-                    System.exit(0);
                     break;
                 default:
                     System.out.println("AIXO NO HAURIA DE SORTIR MAI");
@@ -81,17 +71,21 @@ public class Main {
     private static void gestioEspai() {
         boolean stop = false;
         String preg = "Gestió Espai Aeri. Creació i configuració de nous avions, gestionant els existents també." + LS
-                + "1. Crear nou avió." + LS
-                + "2. Editar un avió existent." + LS
-                + "3. Xifrar avions de combat." + LS
-                + "4. Desxifrar avions de combat." + LS
-                + "5. Torna al menú." + LS
+                + "'0.' Torna al menú." + LS
+                + "'1.' Crear nou avió." + LS
+                + "'2.' Editar un avió existent." + LS
+                + "'3.' Xifrar avions de combat." + LS
+                + "'4.' Desxifrar avions de combat." + LS
+                + "'5.' Canvi de diversos paràmetres del joc. " + LS
                 + "Introdueix l'opció desitjada: ";
 
         while (!stop ) {
             switch (demanarInt(preg, 2)) {
+                case 0:
+                    stop = true;
+                    break;
                 case 1:
-                    switch (demanarInt("Introdueix el tipus d'avio: " + LS + "1. Comercial " + LS + "2. Combat", 2)) {
+                    switch (demanarInt("Introdueix el tipus d'avio: " + LS + "'1.' Comercial " + LS + "'2.' Combat", 2)) {
                         case 1:
                             nouAvioComercial();
                             break;
@@ -111,8 +105,9 @@ public class Main {
                     //desxifrarAvions();
                     break;
                 case 5:
-                    stop = true;
+                    canviParametres();
                     break;
+
             }
         }
     }
@@ -121,46 +116,122 @@ public class Main {
     public static void nouAvioComercial() {
         String identificador = checkMatriculaListString();
         int passatgers = demanarInt("Introdueix el numero de passatgers (màxim "+ MAXPASSATGERS + ")", MAXPASSATGERS);
-        arrayListAvions.add(new AvioComercial(identificador, new Coordenada(0,0,0), passatgers) );
+        arrayListAvions.add(new AvioComercial(identificador, new Coordenada(0,0,0), passatgers, MAXVELOCITATAVIONSCOMERCIALS, MINDISTANCIASEGURETATCOMERCIAL) );
         System.out.println("L'avio s'ha creat amb èxit");
     }
 
     public static void nouAvioCombat() {
         String identificador = checkMatriculaListString();
         int tripulants = demanarInt("Introdueix la quantitat de tripulants (màxim " + MAXTRIPULACIO + ")", MAXTRIPULACIO);
-        arrayListAvions.add(new AvioCombat(identificador, new Coordenada(0,0,0), tripulants) );
+        arrayListAvions.add(new AvioCombat(identificador, new Coordenada(0,0,0), tripulants, MAXVELOCITATAVIONSCOMBAT, MINDISTANCIASEGURETATCOMBAT) );
     }
 
     private static void editarAvio(Avio avio) {
-        String preg;
-        if ( avio instanceof AvioComercial ) {
-            preg = "Indica que vols modificar:" + LS
-                    + "1. Identificador. Actualment és " + avio.getIdentificador() + "." + LS
-                    + "2. Passatgers. Actualment és " + ( (AvioComercial) avio).getPassatgers() + "." + LS;
+        int max;
+        String preg = "Indica que vols modificar:" + LS
+                + "'1.' Identificador. Actualment és " + avio.getIdentificador() + "." + LS
+                + "'2.' Velocitat màxima. Actualment és " + avio.getMaximaVelocitat() + "." + LS
+                + "'3.' Distancia Seguretat. Actualment és " + avio.getMinDistanciaSeguretat() + "." + LS;
 
-            switch (demanarInt(preg, 2 ) ){
-                case 1:
-                    avio.setIdentificador(checkMatriculaListString());
-                    break;
+        if ( avio instanceof AvioComercial ) {
+            max = 4;
+            preg = preg + "'4.' Passatgers. Actualment és " + ( (AvioComercial) avio).getPassatgers() + "." + LS;
+        }
+        else { //edicio d'avio de combat
+            max = 5;
+            preg = preg + "'4.' Tripulacio. Actualment és " + ( (AvioCombat) avio).getTripulacio() + "." + LS
+                        + "'5. Numero de màxim missils. Actualment és " +  ( (AvioCombat) avio).getMissils().getMaxNumShot() + "." + LS;
+        }
+
+        int opcio = (demanarInt(preg, max));
+        switch (opcio){
+            case 1:
+                avio.setIdentificador(checkMatriculaListString());
+                break;
+        }
+
+        if (avio instanceof AvioComercial) {
+            switch (opcio) {
                 case 2:
+                    avio.setMaximaVelocitat(demanarDouble("Introdueix el valor desitjat(MAX:"+MAXVELOCITATAVIONSCOMERCIALS+"):", MAXVELOCITATAVIONSCOMERCIALS));
+                    break;
+                case 3:
+                    avio.setMinDistanciaSeguretat(demanarDouble("Introdueix el valor desitjat(MAX:"+MINDISTANCIASEGURETATCOMERCIAL+"):", MINDISTANCIASEGURETATCOMERCIAL));
+                    break;
+                case 4:
                     ((AvioComercial) avio).setPassatgers(demanarInt("Introdueix el valor desitjat: ", MAXPASSATGERS) );
                     break;
             }
         }
-        else { //edicio d'avio de combat
-            preg = "Indica que vols modificar:" + LS
-                    + "1. Identificador. Actualment és " + avio.getIdentificador() + "." + LS
-                    + "2. Tripulants. Actualment és " + ( (AvioCombat) avio ).getTripulacio() + "." + LS;
-
-            switch (demanarInt(preg, 2) ){
-                case 1:
-                    avio.setIdentificador(checkMatriculaListString());
-                    break;
+        else {
+            switch (opcio) {
                 case 2:
-                    ((AvioCombat) avio).setTripulacio(demanarInt("Introdueix el valor desitjat: ", MAXPASSATGERS) );
+                    avio.setMaximaVelocitat(demanarDouble("Introdueix el valor desitjat(MAX:"+MAXVELOCITATAVIONSCOMBAT+"):", MAXVELOCITATAVIONSCOMBAT));
+                    break;
+                case 3:
+                    avio.setMinDistanciaSeguretat(demanarDouble("Introdueix el valor desitjat(MAX:"+MINDISTANCIASEGURETATCOMBAT+"):", MINDISTANCIASEGURETATCOMBAT));
+                    break;
+                case 4:
+                    ((AvioCombat) avio).setTripulacio(demanarInt("Introdueix el valor desitjat: ", MAXTRIPULACIO) );
+                    break;
+                case 5:
+                    ((AvioCombat) avio).getMissils().setMaxNumShot(demanarInt("Introdueix el valor desitjat(MAXIM 5)", 5 ));
                     break;
             }
         }
+    }
+
+    public static void canviParametres() {
+        boolean stop = false;
+        int max;
+        String preg = "Diversos parametres de diferents elements del programa en el momemnt de la seva creacio. Bàsicament, són els límits del programa." + LS
+            + "'0.' Torna al menú." + LS
+            + "'1.' P: Minim distanca seguretat de avions Comercal: " + MINDISTANCIASEGURETATCOMERCIAL+ LS
+            + "'2.' P: Minim distanca seguretat de avions Combat: " + MINDISTANCIASEGURETATCOMBAT+ LS
+            + "'3.' P: MAX Velocitat Avions Comercials: " + MAXVELOCITATAVIONSCOMERCIALS+ LS
+            + "'4.' P: MAX Velocitat Avions Combat: " + MAXVELOCITATAVIONSCOMBAT + LS
+            + "'5.' P: MAX Passatgers Avions Comercials: " + MAXPASSATGERS + LS
+            + "'6.' P: MAX Tripulacio Avions Combat: " + MAXTRIPULACIO + LS
+            + "'7.' P: LIMIT GESTIO ESPAI AERI: " + MAXCOORDENADA + LS
+            + "Introdueix el parametre que vols cambiar: ";
+
+        while (!stop ) {
+            switch (demanarInt(preg, 7)) {
+                case 0:
+                    stop = true;
+                    break;
+                case 1:
+                    max = 3;
+                    MINDISTANCIASEGURETATCOMERCIAL = demanarDouble("Introdueix fins un maxim de " + max, max);
+                    break;
+                case 2:
+                    max = 3;
+                    MINDISTANCIASEGURETATCOMBAT = demanarDouble("Introdueix fins un maxim de " + max, max);
+                    break;
+                case 3:
+                    max = 100;
+                    MAXVELOCITATAVIONSCOMERCIALS = demanarDouble("Introdueix fins un maxim de " + max, max);
+                    break;
+                case 4:
+                    max = 200;
+                    MAXVELOCITATAVIONSCOMBAT = demanarDouble("Introdueix fins un maxim de " + max, max);
+                    break;
+                case 5:
+                    max = 200;
+                    MAXPASSATGERS = demanarInt("Introdueix fins un maxim de " + max, max);
+                    break;
+                case 6:
+                    max = 40;
+                    MAXPASSATGERS = demanarInt("Introdueix fins un maxim de " + max, max);
+                    break;
+                case 7:
+                    max = 1000;
+                    MAXCOORDENADA = demanarDouble("Introdueix fins un maxim de " + max, max);
+                    break;
+
+            }
+        }
+
     }
     //GESTIOAVIONS//
 
@@ -176,13 +247,12 @@ public class Main {
         String preg;
         int max;
 
-
         if (avio.getClass().equals(AvioComercial.class)) {
             preg = "Control d'avio comercial: "+ avio.getIdentificador() + LS
-                    + "1. Encendre motor." + LS
-                    + "2. Canviar velocitat." + LS
-                    + "3. Establir coordenades." + LS
-                    + "4. Torna al menú." + LS
+                    + "'0.' Torna al menú." + LS
+                    + "'1.' Encendre motor." + LS
+                    + "'2.' Canviar velocitat." + LS
+                    + "'3.' Establir coordenades." + LS
                     + "Introdueix l'opció desitjada: ";
 
             int opcio = demanarInt(preg, 4);
@@ -211,16 +281,20 @@ public class Main {
 
         else {
             preg = "Control d'avio de combat: " + avio.getIdentificador() + LS
-                    + "1. Encendre motor." + LS
-                    + "2. Canviar velocitat." + LS
-                    + "3. Establir coordenades." + LS
-                    + "4. Torna al menú." + LS
+                    + "'0.' Torna al menú." + LS
+                    + "'1.' Encendre motor." + LS
+                    + "'2.' Canviar velocitat." + LS
+                    + "'3.' Establir coordenades." + LS
+                    + "'4.' Disparar objectiu." + LS
                     + "Introdueix l'opció desitjada: ";
 
             int opcio = demanarInt(preg, 4);
 
             while (!stop) {
                 switch (opcio) {
+                    case 0:
+                        stop = true;
+                        break;
                     case 1:
                         avio.motorSwitch();
                         break;
@@ -228,16 +302,20 @@ public class Main {
                         avio.setVelocitat(demanarDouble("Introdueix la velocitat del avió: ", avio.getMaximaVelocitat()));
                         break;
                     case 3:
-
                         Coordenada novaCoord = new Coordenada(demanarDouble("Introdueix X: ", MAXCOORDENADA),
                                 demanarDouble("Introdueix Y: ", MAXCOORDENADA),
                                 demanarDouble("Introdueix Z: ", MAXCOORDENADA));
                         avio.setCoordenadesActuals(novaCoord);
                         break;
-
                     case 4:
-                        stop = true;
+                        int posicioAvioObjectiu = checkMatriculaListPosicio(demanarString("Introdueix el identificador de l'avio que vols disparar"));
+                        Avio avioObjectiu = arrayListAvions.get(posicioAvioObjectiu);
+                        if ( ((AvioCombat)avio).disparar(avioObjectiu) ) {
+                            arrayListAvions.remove(posicioAvioObjectiu);
+                        }
                         break;
+
+
                 }
             }
         }
@@ -247,7 +325,6 @@ public class Main {
 
     private static void mapa() { //printer
         System.out.println("mapa");
-
     }
 
     //eienes del programa
@@ -258,8 +335,8 @@ public class Main {
             System.out.println(LS + pregunta);
             if (teclat.hasNextInt() ) {
                 num = teclat.nextInt();
-                if (num >= 0 && num <= max) {
-                    if (num == 0) {
+                if (num >= -1 && num <= max) {
+                    if (num == -1) {
                         mapa();
                     }
                     else {
@@ -286,7 +363,7 @@ public class Main {
             if (teclat.hasNextDouble() ) {
                 num = teclat.nextDouble();
                 if (num >= 0 && num <= max) {
-                    if (num == 0) {
+                    if (num == -1) {
                         mapa();
                     }
                     else {
@@ -313,7 +390,7 @@ public class Main {
             System.out.println(LS + pregunta);
             resposta = teclat.next();
 
-            if (resposta.length() == 1 && resposta.charAt(0) == '0') {
+            if (resposta.equals("-1")) {
                 mapa();
             }
             else {

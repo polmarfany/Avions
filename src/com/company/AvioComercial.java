@@ -4,8 +4,8 @@ public class AvioComercial extends Avio {
 
     private int passatgers;
 
-    public AvioComercial(String nom, Coordenada coordenada, int passatgers) {
-        super(nom, coordenada);
+    public AvioComercial(String nom, Coordenada coordenada, int passatgers, double maximaVelocitat, double distanciaSeguretat) {
+        super(nom, coordenada, maximaVelocitat, distanciaSeguretat);
         this.passatgers = passatgers;
     }
 
